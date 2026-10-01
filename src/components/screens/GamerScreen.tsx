@@ -1,226 +1,671 @@
 import React, { useState } from 'react';
-import { Gamepad2, Zap, Shield, Cable } from 'lucide-react';
+import { 
+  Gamepad2, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Phone, 
+  UserCheck, 
+  Compass, 
+  Wifi, 
+  Tag, 
+  Home, 
+  CheckCircle, 
+  User, 
+  Link as LinkIcon,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  Share2,
+  Trash2,
+  AlertTriangle,
+  X,
+  Cable,
+  Zap
+} from 'lucide-react';
 import { GamerData } from '../../types/mask';
-import { formatMaskGamer, defaultBaseData } from '../../utils/maskTemplates';
-import { CustomerFormFields } from '../CustomerFormFields';
+import { formatMaskGamer } from '../../utils/maskTemplates';
 import { MaskPreview } from '../MaskPreview';
+import { formatPhone } from '../../utils/formatters';
 
-const initialGamerData: GamerData = {
-  ...defaultBaseData,
-  plano: '600 Mega Gamer Pro (Baixa Latência)',
-  ipFixoPublico: 'Sim (Habilitar)',
-  roteadorGamer: 'Roteador Wi-Fi 6 de Alta Performance',
-  jogosPlataformas: 'PC Gamer (CS2 / Valorant) e PlayStation 5',
-  cabeamentoPcConsole: 'Sim (Passar cabo direto)',
-  qosPrioridade: 'Sim (Baixa latência configurada)'
-};
+const STORAGE_VENDEDOR_KEY = 'os_vendedor_nome';
+
+const CABEAMENTO_SUGGESTIONS = [
+  '1 PC',
+  '1 Console',
+  '1 PC e 1 Console',
+  '1 PC e 1 TV',
+  '1 Console e 1 TV',
+  '1 PC, 1 Console, 1 TV (Até 2 cabeamentos)'
+];
 
 export const GamerScreen: React.FC = () => {
-  const [data, setData] = useState<GamerData>(initialGamerData);
-  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
+  const getInitialVendedor = () => {
+    try {
+      return localStorage.getItem(STORAGE_VENDEDOR_KEY) || '';
+    } catch {
+      return '';
+    }
+  };
+
+  const getInitialData = (sellerName = getInitialVendedor()): GamerData => ({
+    dataInstalacao: '',
+    periodo: 'Comercial',
+    horarioApos: '',
+    podeAdiantar: 'Não',
+    localizacaoLink: '',
+    pontoReferencia: '',
+    postePadrao: 'Sim',
+    telefone1: '',
+    telefone2: '',
+    titularAcompanha: 'Sim',
+    ladoPraiaMorro: 'Praia',
+    plano: 'Gamer 1Gbps + ExitLAG - R$169,90',
+    modalidade: 'KIT GIGA COMODATO',
+    comodoInstalacao: 'IRÁ ESCOLHER COM TÉCNICO',
+    taxaAtivacao: 'INSTALAÇÃO GRATUITA',
+    vendedor: sellerName,
+    dataVencimento: '10',
+    dispositivosCabeados: '1 PC, 1 Console, 1 TV (Até 2 cabeamentos)'
+  });
+
+  const [data, setData] = useState<GamerData>(getInitialData);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [copiedDirect, setCopiedDirect] = useState(false);
+
+  const updateVendedor = (val: string) => {
+    setData(prev => ({ ...prev, vendedor: val }));
+    try {
+      localStorage.setItem(STORAGE_VENDEDOR_KEY, val);
+    } catch (e) {
+      console.warn(e);
+    }
+  };
 
   const updateField = (field: keyof GamerData, value: any) => {
     setData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleReset = () => {
-    if (confirm('Deseja limpar todos os campos desta máscara Gamer?')) {
-      setData(initialGamerData);
-    }
+  const confirmReset = () => {
+    const currentVendedor = data.vendedor;
+    setData(getInitialData(currentVendedor));
+    setShowResetModal(false);
   };
 
   const maskText = formatMaskGamer(data);
 
+  const handleCopyDirect = async () => {
+    try {
+      await navigator.clipboard.writeText(maskText);
+      setCopiedDirect(true);
+      setTimeout(() => setCopiedDirect(false), 2500);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = maskText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopiedDirect(true);
+      setTimeout(() => setCopiedDirect(false), 2500);
+    }
+  };
+
+  const handleWhatsAppDirect = () => {
+    const cleanPhone = (data.telefone1 || '').replace(/\D/g, '');
+    const phoneParam = cleanPhone ? (cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`) : '';
+    const url = phoneParam 
+      ? `https://wa.me/${phoneParam}?text=${encodeURIComponent(maskText)}`
+      : `https://wa.me/?text=${encodeURIComponent(maskText)}`;
+    window.open(url, '_blank');
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Title Header */}
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Title Header with Preview Toggle */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-[#e4022c]/10 text-[#e4022c] flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-[#e4022c]/10 text-[#e4022c] flex items-center justify-center font-bold shrink-0">
             <Gamepad2 className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-slate-900 tracking-tight">O.S. Gamer</h2>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">O.S. GAMER</h2>
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#e4022c] text-white">
-                Alta Performance & Ping Reduzido
+                Alta Performance
               </span>
             </div>
             <p className="text-xs text-slate-500">
-              Instalação voltada para jogadores online, streamers e exigência de rotas otimizadas e IP público
+              Plano de 1Gbps com ExitLAG e cabeamentos
             </p>
           </div>
         </div>
 
-        {/* Mobile View Switcher */}
-        <div className="flex lg:hidden items-center p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+        {/* Toggle Option for Real-time Preview (Disabled by default) */}
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setMobileTab('form')}
-            className={`px-3 py-1.5 rounded-lg transition ${
-              mobileTab === 'form' ? 'bg-white text-[#e4022c] font-bold shadow-xs' : 'text-slate-600'
+            onClick={() => setShowPreview(!showPreview)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+              showPreview
+                ? 'bg-[#e4022c] text-white border-[#e4022c] shadow-xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
             }`}
           >
-            Formulário
+            {showPreview ? (
+              <>
+                <Eye className="w-4 h-4" />
+                <span>Visualização Ativada</span>
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-4 h-4 text-slate-500" />
+                <span>Ativar Visualização em Tempo Real</span>
+              </>
+            )}
           </button>
+
+          {/* Quick Copy */}
           <button
             type="button"
-            onClick={() => setMobileTab('preview')}
-            className={`px-3 py-1.5 rounded-lg transition ${
-              mobileTab === 'preview' ? 'bg-[#e4022c] text-white font-bold shadow-xs' : 'text-slate-600'
+            onClick={handleCopyDirect}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
+              copiedDirect 
+                ? 'bg-emerald-600 text-white' 
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
             }`}
           >
-            Ver Máscara Pronta
+            {copiedDirect ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>Copiar Máscara</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Form Column */}
-        <div className={`space-y-5 lg:col-span-7 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
-            <CustomerFormFields data={data} onChange={updateField} />
+      {/* Main Container */}
+      <div className={`grid grid-cols-1 ${showPreview ? 'lg:grid-cols-12 gap-6' : 'max-w-4xl mx-auto'} items-start`}>
+        {/* Form Column - EXACT 17 FIELDS IN ORDER */}
+        <div className={`space-y-5 ${showPreview ? 'lg:col-span-7' : 'w-full'}`}>
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-5">
+            {/* 1. DATA DA INSTALAÇÃO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>1. Data da Instalação:</span>
+                <span className="text-[#e4022c]">*</span>
+              </label>
+              <input
+                type="date"
+                required
+                value={data.dataInstalacao}
+                onChange={e => updateField('dataInstalacao', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
 
-            {/* Gamer Specific Section */}
-            <div className="bg-slate-50/70 border border-slate-200 rounded-2xl p-4 space-y-4">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#e4022c]" />
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Parâmetros de Rede Gamer & Desempenho
-                </h4>
+            {/* 2. PERÍODO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>2. Período:</span>
+                <span className="text-[#e4022c]">*</span>
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                {[
+                  'Comercial',
+                  'Primeira do Dia',
+                  'Manhã',
+                  'Tarde',
+                  'Após'
+                ].map(p => (
+                  <button
+                    type="button"
+                    key={p}
+                    onClick={() => updateField('periodo', p as any)}
+                    className={`py-2 px-2 rounded-xl text-xs font-bold transition text-center border ${
+                      data.periodo === p
+                        ? 'bg-[#e4022c] text-white border-[#e4022c] shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
               </div>
 
-              {/* Quick Gamer Plan Chips */}
-              <div>
-                <label className="block text-slate-600 font-semibold mb-1 text-xs">
-                  Plano Gamer Selecionado <span className="text-[#e4022c]">*</span>
-                </label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {[
-                    '500 Mega Gamer', 
-                    '600 Mega Gamer Pro', 
-                    '800 Mega Gamer Ultra', 
-                    '1 Giga Gamer Dedicado'
-                  ].map(p => (
-                    <button
-                      type="button"
-                      key={p}
-                      onClick={() => updateField('plano', p)}
-                      className={`text-xs px-2.5 py-1 rounded-lg transition ${
-                        data.plano === p
-                          ? 'bg-[#e4022c] text-white font-bold'
-                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={data.plano}
-                  onChange={e => updateField('plano', e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:ring-2 focus:ring-[#e4022c]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
-                  <label className="block text-slate-600 font-semibold mb-1">
-                    IP Fixo / IP Público Válido
-                  </label>
-                  <select
-                    value={data.ipFixoPublico}
-                    onChange={e => updateField('ipFixoPublico', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:ring-2 focus:ring-[#e4022c]"
-                  >
-                    <option value="Sim (Habilitar)">Sim (Habilitar IP Fixo/Público)</option>
-                    <option value="Apenas IP Público Dinâmico">Apenas IP Público Dinâmico (Sem CGNAT)</option>
-                    <option value="Não (CGNAT Padrão)">Não (CGNAT Padrão)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-600 font-semibold mb-1">
-                    Passar Cabo Direto no PC/Console?
-                  </label>
-                  <select
-                    value={data.cabeamentoPcConsole}
-                    onChange={e => updateField('cabeamentoPcConsole', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:ring-2 focus:ring-[#e4022c]"
-                  >
-                    <option value="Sim (Passar cabo direto)">Sim (Passar cabo de rede direto)</option>
-                    <option value="Não (Apenas Wi-Fi)">Não (Apenas Wi-Fi)</option>
-                    <option value="Cliente já possui cabo">Cliente já possui cabo passado</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-slate-600 font-semibold mb-1">Equipamento Fornecido</label>
-                  <select
-                    value={data.roteadorGamer}
-                    onChange={e => updateField('roteadorGamer', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:ring-2 focus:ring-[#e4022c]"
-                  >
-                    <option value="Roteador Wi-Fi 6 de Alta Performance">Roteador Wi-Fi 6 AX de Alta Performance</option>
-                    <option value="ONU Wi-Fi 6 Mesh">ONU Wi-Fi 6 Mesh Integrada</option>
-                    <option value="Cliente possui roteador próprio">Cliente possui roteador gamer próprio (Modo Bridge)</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-slate-600 font-semibold mb-1">
-                    Jogos / Plataformas Principais do Cliente
+              {data.periodo === 'Após' && (
+                <div className="mt-2.5 pl-1 animate-in fade-in duration-150">
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Informe o horário do agendamento:
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: Counter-Strike 2, Valorant, Warzone, FIFA, PS5, Xbox Series X"
-                    value={data.jogosPlataformas}
-                    onChange={e => updateField('jogosPlataformas', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:ring-2 focus:ring-[#e4022c]"
+                    placeholder="Ex: 14h30 / 16h / Após às 15h"
+                    value={data.horarioApos}
+                    onChange={e => updateField('horarioApos', e.target.value)}
+                    className="w-full bg-amber-50/70 border border-amber-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
                   />
                 </div>
+              )}
+            </div>
 
-                <div className="sm:col-span-2">
-                  <label className="block text-slate-600 font-semibold mb-1">Priorização de Tráfego / QoS</label>
-                  <select
-                    value={data.qosPrioridade}
-                    onChange={e => updateField('qosPrioridade', e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:ring-2 focus:ring-[#e4022c]"
+            {/* 3. PODE ADIANTAR? */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs">
+                3. Pode Adiantar?
+              </label>
+              <div className="flex gap-2">
+                {['Sim', 'Não'].map(opt => (
+                  <button
+                    type="button"
+                    key={opt}
+                    onClick={() => updateField('podeAdiantar', opt as any)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition border ${
+                      data.podeAdiantar === opt
+                        ? opt === 'Sim' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-800 text-white border-slate-800'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
                   >
-                    <option value="Sim (Baixa latência configurada)">Sim (Configurar QoS e rota de baixa latência)</option>
-                    <option value="Padrão">Padrão</option>
-                  </select>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. LOCALIZAÇÃO (LINK GOOGLE) */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <LinkIcon className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>4. Localização (Link Google):</span>
+              </label>
+              <input
+                type="text"
+                placeholder="https://maps.app.goo.gl/... ou link Google Maps"
+                value={data.localizacaoLink}
+                onChange={e => updateField('localizacaoLink', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 5. PONTO DE REFERÊNCIA */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>5. Ponto de referência:</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Não informado"
+                value={data.pontoReferencia}
+                onChange={e => updateField('pontoReferencia', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 6. POSTE PADRÃO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs">
+                6. Poste Padrão:
+              </label>
+              <div className="flex gap-2">
+                {['Sim', 'Não'].map(opt => (
+                  <button
+                    type="button"
+                    key={opt}
+                    onClick={() => updateField('postePadrao', opt as any)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition border ${
+                      data.postePadrao === opt
+                        ? 'bg-[#e4022c] text-white border-[#e4022c]'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 7. TELEFONE 1 */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>7. Telefone 1:</span>
+                <span className="text-[#e4022c]">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="(00) 00000-0000"
+                value={data.telefone1}
+                onChange={e => updateField('telefone1', formatPhone(e.target.value))}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 8. TELEFONE 2 */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-slate-400" />
+                <span>8. Telefone 2:</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Não informado"
+                value={data.telefone2}
+                onChange={e => updateField('telefone2', formatPhone(e.target.value))}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 9. TITULAR IRÁ ACOMPANHAR A INSTALAÇÃO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>9. Titular irá acompanhar a instalação:</span>
+              </label>
+              <div className="flex gap-2">
+                {['Sim', 'Não'].map(opt => (
+                  <button
+                    type="button"
+                    key={opt}
+                    onClick={() => updateField('titularAcompanha', opt as any)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition border ${
+                      data.titularAcompanha === opt
+                        ? 'bg-[#e4022c] text-white border-[#e4022c]'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 10. LADO PRAIA OU MORRO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs flex items-center gap-1.5">
+                <Compass className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>10. Lado Praia ou Morro:</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: 'Praia', label: '🏖️ Lado Praia' },
+                  { id: 'Morro', label: '⛰️ Lado Morro' }
+                ].map(side => (
+                  <button
+                    type="button"
+                    key={side.id}
+                    onClick={() => updateField('ladoPraiaMorro', side.id as any)}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition border ${
+                      data.ladoPraiaMorro === side.id
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {side.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 11. PLANO: Gamer 1Gbps + ExitLAG - R$169,90 */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Wifi className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>11. Plano:</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Gamer 1Gbps + ExitLAG - R$169,90"
+                value={data.plano}
+                onChange={e => updateField('plano', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 12. MODALIDADE: KIT GIGA COMODATO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>12. Modalidade:</span>
+                <span className="text-[10px] text-slate-400 font-normal">(Fixo)</span>
+              </label>
+              <div className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 flex items-center justify-between select-none">
+                <span>KIT GIGA COMODATO</span>
+                <span className="text-[10px] uppercase font-bold text-[#e4022c] bg-[#e4022c]/10 px-2 py-0.5 rounded">
+                  Padrão Fixo
+                </span>
+              </div>
+            </div>
+
+            {/* 13. COMODO DE INSTALAÇÃO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Home className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>13. Comodo de Instalação:</span>
+              </label>
+              <input
+                type="text"
+                placeholder="IRÁ ESCOLHER COM TÉCNICO"
+                value={data.comodoInstalacao}
+                onChange={e => updateField('comodoInstalacao', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 14. TAXA DE ATIVAÇÃO */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>14. Taxa de Ativação:</span>
+              </label>
+              <input
+                type="text"
+                placeholder="INSTALAÇÃO GRATUITA"
+                value={data.taxaAtivacao}
+                onChange={e => updateField('taxaAtivacao', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 15. VENDEDOR(A) - Esse campo NÃO deve ser apagado com o botão de limpar */}
+            <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5">
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#e4022c]" />
+                  <span>15. Vendedor(a):</span>
                 </div>
+                <span className="text-[10px] text-amber-800 font-semibold">
+                  🔒 Permanente (Não apaga ao limpar campos)
+                </span>
+              </label>
+              <input
+                type="text"
+                placeholder="Digite seu nome..."
+                value={data.vendedor}
+                onChange={e => updateVendedor(e.target.value)}
+                className="w-full bg-white border border-amber-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* 16. DATA DE VENCIMENTO: 05, 10, 15, 20 ou 25 */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1.5 text-xs">
+                16. Data de vencimento:
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {['05', '10', '15', '20', '25'].map(dia => (
+                  <button
+                    type="button"
+                    key={dia}
+                    onClick={() => updateField('dataVencimento', dia as any)}
+                    className={`py-2 rounded-xl text-xs font-bold transition font-mono border ${
+                      data.dataVencimento === dia
+                        ? 'bg-[#e4022c] text-white border-[#e4022c] shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    Dia {dia}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 17. QTD. E DISPOSITIVOS QUE SERÃO CABEADOS */}
+            <div>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Cable className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>17. Qtd. e Dispositivos que serão cabeados:</span>
+              </label>
+
+              {/* Suggestions Chips */}
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {CABEAMENTO_SUGGESTIONS.map(chip => (
+                  <button
+                    type="button"
+                    key={chip}
+                    onClick={() => updateField('dispositivosCabeados', chip)}
+                    className={`text-[11px] px-2.5 py-1 rounded-lg border transition ${
+                      data.dispositivosCabeados === chip
+                        ? 'bg-[#e4022c] text-white border-[#e4022c] font-bold shadow-xs'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                ))}
               </div>
 
-              <div>
-                <label className="block text-slate-600 font-semibold mb-1 text-xs">
-                  Observações Técnicas para o Instalador
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Ex: Medir ping e jitter nos servidores da Riot/Valve. Deixar canal Wi-Fi 5GHz limpo e sem interferência."
-                  value={data.observacoes}
-                  onChange={e => updateField('observacoes', e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
-                />
+              <input
+                type="text"
+                placeholder="1 PC, 1 Console, 1 TV (Até 2 cabeamentos)"
+                value={data.dispositivosCabeados}
+                onChange={e => updateField('dispositivosCabeados', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+              />
+            </div>
+
+            {/* BOTTOM ACTIONS BAR & LIMPAR CAMPOS BUTTON */}
+            <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setShowResetModal(true)}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-700 text-xs font-bold transition"
+              >
+                <Trash2 className="w-4 h-4 text-rose-600" />
+                Limpar Campos
+              </button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleWhatsAppDirect}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition"
+                >
+                  <Share2 className="w-4 h-4 text-emerald-600" />
+                  WhatsApp
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyDirect}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-sm transition active:scale-[0.98] ${
+                    copiedDirect
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-[#e4022c] hover:bg-[#c30225] text-white'
+                  }`}
+                >
+                  {copiedDirect ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Máscara Copiada!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copiar Máscara
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Live Mask Preview */}
-        <div className={`lg:col-span-5 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
-          <MaskPreview
-            title="Gamer"
-            maskText={maskText}
-            onReset={handleReset}
-            clientPhone={data.telefone1}
-          />
-        </div>
+        {/* Live Mask Preview Column (Shown ONLY if user activated it) */}
+        {showPreview && (
+          <div className="lg:col-span-5 animate-in fade-in duration-200 mt-6 lg:mt-0">
+            <MaskPreview
+              title="GAMER"
+              maskText={maskText}
+              onReset={() => setShowResetModal(true)}
+              clientPhone={data.telefone1}
+            />
+          </div>
+        )}
       </div>
+
+      {/* CONFIRMATION MODAL: LIMPAR CAMPOS */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">Limpar todos os campos?</h3>
+                  <p className="text-[11px] text-slate-500">Confirmação de limpeza do formulário</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 text-xs text-slate-600 space-y-2">
+              <p>
+                Todos os dados digitados nesta Ordem de Serviço de <strong>GAMER</strong> serão restaurados para os valores padrão.
+              </p>
+              <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold">
+                🔒 <strong>Importante:</strong> O campo <strong>Vendedor(a)</strong> ({data.vendedor || 'não informado'}) NÃO será apagado.
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowResetModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmReset}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#e4022c] hover:bg-[#c30225] text-white shadow-xs transition"
+              >
+                Sim, Limpar Campos
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

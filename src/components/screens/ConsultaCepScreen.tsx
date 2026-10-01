@@ -7,21 +7,23 @@ import {
   ExternalLink, 
   Navigation,
   FileSpreadsheet,
-  X
+  X,
+  Filter
 } from 'lucide-react';
 import cepsCsvRaw from '../../data/ceps.csv?raw';
 import { CepItem } from '../../types/mask';
 
 export const ConsultaCepScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCity, setSelectedCity] = useState<string>('all');
   const [copiedCep, setCopiedCep] = useState<string | null>(null);
-  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [copiedMapsLink, setCopiedMapsLink] = useState<string | null>(null);
 
   // Parse CSV dataset into structured records, strictly ignoring header
-  const allItems = useMemo(() => {
+  const { allItems, uniqueCities } = useMemo(() => {
     const lines = cepsCsvRaw.split(/\r?\n/);
     const items: CepItem[] = [];
+    const citiesSet = new Set<string>();
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -37,31 +39,40 @@ export const ConsultaCepScreen: React.FC = () => {
         if (
           cep.toUpperCase() === 'CEP' || 
           logradouro.toUpperCase() === 'LOGRADOURO' || 
-          cidade.toUpperCase() === 'CIDADE'
+          cidade.toUpperCase() === 'CIDADE' ||
+          bairro.toUpperCase() === 'BAIRRO'
         ) {
           continue;
         }
 
         if (cep && logradouro) {
           items.push({ cep, logradouro, bairro, cidade });
+          if (cidade) {
+            citiesSet.add(cidade);
+          }
         }
       }
     }
 
-    return items;
+    return {
+      allItems: items,
+      uniqueCities: Array.from(citiesSet).sort()
+    };
   }, []);
 
-  // Filter items directly by CEP or Street/Neighborhood query
+  // Filter items by CEP/Street and City
   const filteredResults = useMemo(() => {
     const rawQuery = searchTerm.trim().toLowerCase();
     const cleanNumbers = searchTerm.replace(/\D/g, '');
 
-    if (!rawQuery) {
-      // Show first 30 sample entries initially
-      return allItems.slice(0, 30);
-    }
-
     return allItems.filter(item => {
+      // City Filter
+      if (selectedCity !== 'all' && item.cidade.toLowerCase() !== selectedCity.toLowerCase()) {
+        return false;
+      }
+
+      if (!rawQuery) return true;
+
       // If user typed digits, test matching CEP numbers
       if (cleanNumbers.length >= 3) {
         const itemCleanCep = item.cep.replace(/\D/g, '');
@@ -77,7 +88,7 @@ export const ConsultaCepScreen: React.FC = () => {
 
       return matchLogradouro || matchBairro || matchCepRaw;
     }).slice(0, 80); // Cap at 80 items for high performance rendering
-  }, [allItems, searchTerm]);
+  }, [allItems, searchTerm, selectedCity]);
 
   const handleCopyCep = (cep: string) => {
     navigator.clipboard.writeText(cep);
@@ -121,26 +132,48 @@ export const ConsultaCepScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Full-width Search Bar (Without City Dropdown per user request) */}
+      {/* Search and Filters Bar with City Selection */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3.5">
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-          <input
-            type="text"
-            placeholder="Digite o CEP (ex: 11742-628) ou o nome da rua (ex: Gaivota, Savoy, Acre, Anchieta)..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-10 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3.5 top-3.5 p-0.5 text-slate-400 hover:text-slate-600 rounded-full"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+          {/* Main Search Input */}
+          <div className="md:col-span-8 relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+            <input
+              type="text"
+              placeholder="Digite o CEP (ex: 11742-628) ou nome da rua (ex: Gaivota, Savoy, Acre, Anchieta)..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3.5 top-3.5 p-0.5 text-slate-400 hover:text-slate-600 rounded-full"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* City Selection Dropdown */}
+          <div className="md:col-span-4 relative">
+            <div className="relative">
+              <Filter className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+              <select
+                value={selectedCity}
+                onChange={e => setSelectedCity(e.target.value)}
+                className="w-full pl-9 pr-8 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c] cursor-pointer"
+              >
+                <option value="all">Todas as Cidades ({uniqueCities.length})</option>
+                {uniqueCities.map(city => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Quick Search Chips */}
@@ -171,13 +204,13 @@ export const ConsultaCepScreen: React.FC = () => {
               ? 'Nenhum endereço encontrado para a pesquisa' 
               : `Exibindo ${filteredResults.length} resultado(s)${filteredResults.length === 80 ? ' (refine sua busca para mais)' : ''}:`}
           </span>
-          {searchTerm && (
+          {(searchTerm || selectedCity !== 'all') && (
             <button
               type="button"
-              onClick={() => setSearchTerm('')}
+              onClick={() => { setSearchTerm(''); setSelectedCity('all'); }}
               className="text-[#e4022c] hover:underline"
             >
-              Limpar busca
+              Limpar filtros
             </button>
           )}
         </div>

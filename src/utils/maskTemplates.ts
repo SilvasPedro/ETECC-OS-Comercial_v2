@@ -5,8 +5,95 @@ import {
   GamerData, 
   ComboData,
   ComboTVData, 
-  PontoAdicionalData 
+  PontoAdicionalData,
+  AvaliacaoTVData,
+  AvaliacaoCabeamentoData,
+  ETrackerData
 } from '../types/mask';
+
+export const formatMaskETracker = (data: ETrackerData): string => {
+  let formattedData = data.data;
+  if (data.data && data.data.includes('-')) {
+    const parts = data.data.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
+  const tipoVeiculoTexto = data.tipoVeiculo === 'OUTRO' && data.outroTipoVeiculo
+    ? `OUTRO (${data.outroTipoVeiculo})`
+    : data.tipoVeiculo;
+
+  return `========================================
+🚗 MÁSCARA DE O.S. - E-TRACKER
+========================================
+DATA: ${formattedData || ''}
+PERÍODO: ${periodoTexto || ''}
+CONTATO: ${data.contato || ''}
+TITULAR DA INTERNET É O MESMO DO VEICULO: ${data.titularInternetMesmoVeiculo || 'SIM'}
+TIPO DO VEICULO: ${tipoVeiculoTexto || 'CARRO'}
+QUANTIDADE DE VEICULOS: ${data.quantidadeVeiculos || '1'}
+NUMERO DO RASTREADOR: ${data.numeroRastreador || ''}
+NUMERO DO CHIP DO RASTREADOR: ${data.numeroChipRastreador || ''}
+NUMERO DA LINHA DO CHIP (CLIENTE): ${data.numeroLinhaChipCliente || ''}
+MODELO RASTREADOR: ${data.modeloRastreador || 'XT40'}
+========================================`;
+};
+
+export const formatMaskAvaliacaoTV = (data: AvaliacaoTVData): string => {
+  let formattedData = data.data;
+  if (data.data && data.data.includes('-')) {
+    const parts = data.data.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
+  return `========================================
+📋 MÁSCARA DE O.S. - AVALIAÇÃO CABEAMENTO TV
+========================================
+Data: ${formattedData || ''}
+Período: ${periodoTexto || ''}
+Combo: ${data.combo || 'TIP'}
+Cliente baixou App: ${data.clienteBaixouApp || 'Não'}
+Quantas TV's: ${data.quantasTvs || '1'}
+TV Smart?: ${data.tvSmart || 'Sim'}
+Termo Aceito: ${data.termoAceito || 'Sim'}
+========================================`;
+};
+
+export const formatMaskAvaliacaoCabeamento = (data: AvaliacaoCabeamentoData): string => {
+  let formattedData = data.data;
+  if (data.data && data.data.includes('-')) {
+    const parts = data.data.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
+  return `========================================
+📋 MÁSCARA DE O.S. - AVALIAÇÃO CABEAMENTO
+========================================
+Data: ${formattedData || ''}
+Período: ${periodoTexto || ''}
+Serviço: ${data.servico || 'Ponto Adicional'}
+Isento: ${data.isento || 'Não'}
+Equipamento: ${data.equipamento || 'Comodato'}
+Plano: ${data.plano || ''}
+========================================`;
+};
 
 export const formatMaskComodato = (data: ComodatoData): string => {
   let formattedData = data.dataInstalacao;
@@ -113,35 +200,38 @@ ${data.observacoes || 'Nenhuma observação adicional.'}
 };
 
 export const formatMaskGamer = (data: GamerData): string => {
+  let formattedData = data.dataInstalacao;
+  if (data.dataInstalacao && data.dataInstalacao.includes('-')) {
+    const parts = data.dataInstalacao.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
   return `========================================
-🎮 MÁSCARA DE O.S. - PLANO GAMER (ALTA PERFORMANCE)
+🎮 MÁSCARA DE O.S. - GAMER
 ========================================
-PROTOCOLO: ${data.protocolo || 'N/A'}
-DATA AGENDAMENTO: ${data.dataAgendamento || 'A definir'}
-PERÍODO: ${data.periodo}
-VENDEDOR(A): ${data.vendedor || 'Comercial'}
-
-[DADOS DO CLIENTE]
-NOME: ${data.nomeCliente || 'N/A'}
-CPF/CNPJ: ${data.cpfCnpj || 'N/A'}
-CONTATO 1: ${data.telefone1 || 'N/A'}
-CONTATO 2: ${data.telefone2 || 'Não informado'}
-ENDEREÇO: ${data.endereco || ''}${data.numero ? `, Nº ${data.numero}` : ''}${data.complemento ? ` - ${data.complemento}` : ''}
-BAIRRO: ${data.bairro || 'N/A'}
-CIDADE: ${data.cidade || 'N/A'}
-CEP: ${data.cep || 'N/A'}
-REF: ${data.pontoReferencia || 'Não informada'}
-
-[ESPECIFICAÇÕES TÉCNICAS GAMER]
-PLANO CONTRATADO: ${data.plano || 'Plano Gamer'}
-IP FIXO / PÚBLICO: ${data.ipFixoPublico}
-EQUIPAMENTO: ${data.roteadorGamer}
-PASSAR CABO DIRETO NO PC/CONSOLE: ${data.cabeamentoPcConsole}
-JOGOS/PLATAFORMAS PRINCIPAIS: ${data.jogosPlataformas || 'PC Gamer / Console'}
-QOS & PRIORIZAÇÃO DE LATÊNCIA: ${data.qosPrioridade}
-
-[OBSERVAÇÕES TÉCNICAS]
-${data.observacoes || 'Verificar rotas e atenuação na fibra para garantir menor ping possível.'}
+Data da Instalação: ${formattedData || ''}
+Período: ${periodoTexto || ''}
+Pode Adiantar?: ${data.podeAdiantar || 'Não'}
+Localização (Link Google): ${data.localizacaoLink || ''}
+Ponto de referência: ${data.pontoReferencia || 'Não informado'}
+Poste Padrão: ${data.postePadrao || 'Sim'}
+Telefone 1: ${data.telefone1 || ''}
+Telefone 2: ${data.telefone2 || 'Não informado'}
+Titular irá acompanhar a instalação: ${data.titularAcompanha || 'Sim'}
+Lado Praia ou Morro: ${data.ladoPraiaMorro || 'Praia'}
+Plano: ${data.plano || 'Gamer 1Gbps + ExitLAG - R$169,90'}
+Modalidade: KIT GIGA COMODATO
+Comodo de Instalação: ${data.comodoInstalacao || 'IRÁ ESCOLHER COM TÉCNICO'}
+Taxa de Ativação: ${data.taxaAtivacao || 'INSTALAÇÃO GRATUITA'}
+Vendedor(a): ${data.vendedor || ''}
+Data de vencimento: ${data.dataVencimento || '10'}
+Qtd. e Dispositivos que serão cabeados: ${data.dispositivosCabeados || '1 PC, 1 Console, 1 TV (Até 2 cabeamentos)'}
 ========================================`;
 };
 

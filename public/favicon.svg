@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff1a40"/>
+      <stop offset="100%" stop-color="#b80020"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="64" height="64" rx="16" fill="url(#brandGrad)"/>
+
+  <!-- Document / OS Badge -->
+  <rect x="14" y="14" width="36" height="40" rx="6" fill="#ffffff" filter="url(#shadow)"/>
+  
+  <!-- Header clip on document -->
+  <rect x="22" y="10" width="20" height="7" rx="3.5" fill="#1e293b"/>
+  
+  <!-- Checkmark in primary brand color -->
+  <path d="M22 34 L28 40 L42 24" fill="none" stroke="#e4022c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Mini Signal / Wifi pulses in top right corner -->
+  <circle cx="48" cy="14" r="5" fill="#10b981"/>
+</svg>

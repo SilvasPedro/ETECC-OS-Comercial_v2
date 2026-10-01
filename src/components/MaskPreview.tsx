@@ -54,18 +54,18 @@ export const MaskPreview: React.FC<MaskPreviewProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full sticky top-4">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full sticky top-20 transition-colors duration-200">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70 rounded-t-2xl">
+      <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/60 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-[#e4022c]" />
-          <h3 className="font-bold text-slate-800 text-sm">Máscara Gerada em Tempo Real</h3>
+          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Máscara Gerada em Tempo Real</h3>
         </div>
 
         <button
           type="button"
           onClick={onReset}
-          className="text-xs text-slate-400 hover:text-slate-700 flex items-center gap-1 font-medium transition"
+          className="text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1 font-medium transition"
           title="Limpar formulário"
         >
           <RotateCcw className="w-3.5 h-3.5" />
@@ -75,7 +75,7 @@ export const MaskPreview: React.FC<MaskPreviewProps> = ({
 
       {/* Main Text Block */}
       <div className="p-4 flex-1 flex flex-col">
-        <div className="relative flex-1 bg-slate-900 rounded-xl p-4 overflow-hidden border border-slate-800">
+        <div className="relative flex-1 bg-slate-950 dark:bg-black/80 rounded-xl p-4 overflow-hidden border border-slate-800">
           <pre className="font-mono text-xs text-slate-200 whitespace-pre-wrap break-all overflow-y-auto max-h-[620px] select-all leading-relaxed">
             {maskText}
           </pre>
@@ -109,16 +109,16 @@ export const MaskPreview: React.FC<MaskPreviewProps> = ({
             <button
               type="button"
               onClick={handleWhatsApp}
-              className="py-2 px-3 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+              className="py-2 px-3 rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
             >
-              <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+              <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               WhatsApp
             </button>
 
             <button
               type="button"
               onClick={handleDownloadTxt}
-              className="py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+              className="py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
             >
               <Download className="w-3.5 h-3.5 text-slate-500" />
               Baixar .TXT

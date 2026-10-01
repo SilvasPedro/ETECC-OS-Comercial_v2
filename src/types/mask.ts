@@ -1,4 +1,40 @@
-export type OSType = 'comodato' | 'smart_pre' | 'gamer' | 'combo_tv' | 'ponto_adicional' | 'consulta_cep';
+export type OSType = 'comodato' | 'smart_pre' | 'gamer' | 'combo_tv' | 'avaliacao' | 'e_tracker' | 'ponto_adicional' | 'consulta_cep';
+
+export interface ETrackerData {
+  data: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  contato: string;
+  titularInternetMesmoVeiculo: 'SIM' | 'NÃO';
+  tipoVeiculo: 'MOTO' | 'CARRO' | 'CAMINHÃO' | 'OUTRO';
+  outroTipoVeiculo?: string;
+  quantidadeVeiculos: string;
+  numeroRastreador: string;
+  numeroChipRastreador: string;
+  numeroLinhaChipCliente: string;
+  modeloRastreador: string; // 'XT40' | 'Outro'
+}
+
+export interface AvaliacaoTVData {
+  data: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  combo: 'TIP' | 'Sky+';
+  clienteBaixouApp: 'Sim' | 'Não';
+  quantasTvs: string;
+  tvSmart: 'Sim' | 'Não';
+  termoAceito: 'Sim' | 'Não';
+}
+
+export interface AvaliacaoCabeamentoData {
+  data: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  servico: 'Ponto Adicional' | 'Cabeamento Plano Gamer';
+  isento: 'Sim' | 'Não';
+  equipamento: 'Comodato' | 'Do cliente';
+  plano: string;
+}
 
 export interface ComodatoData {
   dataInstalacao: string;
@@ -69,13 +105,25 @@ export interface CompraData extends BaseCustomerData {
   configuracaoDesejada: string;
 }
 
-export interface GamerData extends BaseCustomerData {
+export interface GamerData {
+  dataInstalacao: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  podeAdiantar: 'Sim' | 'Não';
+  localizacaoLink: string;
+  pontoReferencia: string;
+  postePadrao: 'Sim' | 'Não';
+  telefone1: string;
+  telefone2: string;
+  titularAcompanha: 'Sim' | 'Não';
+  ladoPraiaMorro: 'Praia' | 'Morro';
   plano: string;
-  ipFixoPublico: 'Sim (Habilitar)' | 'Não (CGNAT Padrão)' | 'Apenas IP Público Dinâmico';
-  roteadorGamer: 'Roteador Wi-Fi 6 de Alta Performance' | 'ONU Wi-Fi 6 Mesh' | 'Cliente possui roteador próprio';
-  jogosPlataformas: string;
-  cabeamentoPcConsole: 'Sim (Passar cabo direto)' | 'Não (Apenas Wi-Fi)' | 'Cliente já possui cabo';
-  qosPrioridade: 'Sim (Baixa latência configurada)' | 'Padrão';
+  modalidade: string; // 'KIT GIGA COMODATO' (Fixo)
+  comodoInstalacao: string; // 'IRÁ ESCOLHER COM TÉCNICO'
+  taxaAtivacao: string; // 'INSTALAÇÃO GRATUITA'
+  vendedor: string;
+  dataVencimento: '05' | '10' | '15' | '20' | '25';
+  dispositivosCabeados: string;
 }
 
 export interface ComboData {

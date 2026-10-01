@@ -1,7 +1,9 @@
 import { 
   ComodatoData, 
+  SmartPreData,
   CompraData, 
   GamerData, 
+  ComboData,
   ComboTVData, 
   PontoAdicionalData 
 } from '../types/mask';
@@ -39,6 +41,40 @@ Taxa de Ativação: ${data.taxaAtivacao || 'INSTALAÇÃO GRATUITA'}
 Vendedor(a): ${data.vendedor || ''}
 Data de vencimento: ${data.dataVencimento || '10'}
 Avaliação para ponto adicional: ${data.avaliacaoPontoAdicional || 'Não'}
+========================================`;
+};
+
+export const formatMaskSmartPre = (data: SmartPreData): string => {
+  let formattedData = data.dataInstalacao;
+  if (data.dataInstalacao && data.dataInstalacao.includes('-')) {
+    const parts = data.dataInstalacao.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
+  return `========================================
+📋 MÁSCARA DE O.S. - SMART-PRÉ
+========================================
+Data da Instalação: ${formattedData || ''}
+Período: ${periodoTexto || ''}
+Pode Adiantar?: ${data.podeAdiantar || 'Não'}
+Localização (Link Google): ${data.localizacaoLink || ''}
+Ponto de referência: ${data.pontoReferencia || 'Não informado'}
+Poste Padrão: ${data.postePadrao || 'Sim'}
+Telefone 1: ${data.telefone1 || ''}
+Telefone 2: ${data.telefone2 || 'Não informado'}
+Titular irá acompanhar a instalação: ${data.titularAcompanha || 'Sim'}
+Lado Praia ou Morro: ${data.ladoPraiaMorro || 'Praia'}
+Plano: 1Gbps - Sistema de Recargas
+Modalidade: KIT GIGA SMART-PRÉ
+Comodo de Instalação: ${data.comodoInstalacao || 'IRÁ ESCOLHER COM TÉCNICO'}
+Taxa de Ativação: ${data.taxaAtivacao || 'INSTALAÇÃO GRATUITA'}
+Vendedor(a): ${data.vendedor || ''}
 ========================================`;
 };
 
@@ -109,37 +145,38 @@ ${data.observacoes || 'Verificar rotas e atenuação na fibra para garantir meno
 ========================================`;
 };
 
-export const formatMaskComboTV = (data: ComboTVData): string => {
+export const formatMaskCombo = (data: ComboData): string => {
+  let formattedData = data.dataInstalacao;
+  if (data.dataInstalacao && data.dataInstalacao.includes('-')) {
+    const parts = data.dataInstalacao.split('-');
+    if (parts.length === 3) {
+      formattedData = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  const periodoTexto = data.periodo === 'Após'
+    ? `Após (${data.horarioApos || 'Informar horário'})`
+    : data.periodo;
+
   return `========================================
-📺 MÁSCARA DE O.S. - COMBO INTERNET + TV
+📋 MÁSCARA DE O.S. - COMBO
 ========================================
-PROTOCOLO: ${data.protocolo || 'N/A'}
-DATA AGENDAMENTO: ${data.dataAgendamento || 'A definir'}
-PERÍODO: ${data.periodo}
-VENDEDOR(A): ${data.vendedor || 'Comercial'}
-
-[DADOS DO CLIENTE]
-NOME: ${data.nomeCliente || 'N/A'}
-CPF/CNPJ: ${data.cpfCnpj || 'N/A'}
-CONTATO 1: ${data.telefone1 || 'N/A'}
-CONTATO 2: ${data.telefone2 || 'Não informado'}
-ENDEREÇO: ${data.endereco || ''}${data.numero ? `, Nº ${data.numero}` : ''}${data.complemento ? ` - ${data.complemento}` : ''}
-BAIRRO: ${data.bairro || 'N/A'}
-CIDADE: ${data.cidade || 'N/A'}
-CEP: ${data.cep || 'N/A'}
-REF: ${data.pontoReferencia || 'Não informada'}
-
-[DADOS DO COMBO & TV]
-PLANO INTERNET: ${data.planoInternet || 'N/A'}
-PACOTE TV: ${data.pacoteTv || 'N/A'}
-QTD DE TV BOXES / APARELHOS: ${data.qtdTvBoxes || '1'}
-TIPO DE RECEPTOR: ${data.tipoAparelho}
-STREAMINGS INCLUSOS: ${data.streamingIncluso || 'Canais ao vivo'}
-LOCAL DO PONTO PRINCIPAL: ${data.pontoPrincipal || 'Sala de estar'}
-PONTOS ADICIONAIS DE TV: ${data.pontosTvInstalar || 'Apenas ponto principal'}
-
-[OBSERVAÇÕES DE INSTALAÇÃO DA TV]
-${data.observacoes || 'Orientar cliente sobre navegação no aplicativo/box e testar login.'}
+Data da Instalação: ${formattedData || ''}
+Período: ${periodoTexto || ''}
+Pode Adiantar?: ${data.podeAdiantar || 'Não'}
+Localização (Link Google): ${data.localizacaoLink || ''}
+Ponto de referência: ${data.pontoReferencia || 'Não informado'}
+Poste Padrão: ${data.postePadrao || 'Sim'}
+Telefone 1: ${data.telefone1 || ''}
+Telefone 2: ${data.telefone2 || 'Não informado'}
+Titular irá acompanhar a instalação: ${data.titularAcompanha || 'Sim'}
+Lado Praia ou Morro: ${data.ladoPraiaMorro || 'Praia'}
+Tipo de Combo: ${data.tipoCombo || 'Internet + TV'}
+Plano: ${data.plano || 'Combo Básico - 139,90'}
+Modalidade: KIT GIGA COMODATO (FIXO)
+Comodo de Instalação: ${data.comodoInstalacao || 'IRÁ ESCOLHER COM TÉCNICO'}
+Taxa de Ativação: ${data.taxaAtivacao || 'INSTALAÇÃO GRATUITA'}
+Vendedor(a): ${data.vendedor || ''}
 ========================================`;
 };
 

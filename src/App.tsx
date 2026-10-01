@@ -18,10 +18,11 @@ import {
 import { OSType } from './types/mask';
 import { Sidebar } from './components/Sidebar';
 import { ComodatoScreen } from './components/screens/ComodatoScreen';
-import { CompraScreen } from './components/screens/CompraScreen';
+import { SmartPreScreen } from './components/screens/SmartPreScreen';
 import { GamerScreen } from './components/screens/GamerScreen';
 import { ComboTVScreen } from './components/screens/ComboTVScreen';
 import { PontoAdicionalScreen } from './components/screens/PontoAdicionalScreen';
+import { ConsultaCepScreen } from './components/screens/ConsultaCepScreen';
 
 export default function App() {
   const [currentType, setCurrentType] = useState<OSType>('comodato');
@@ -32,14 +33,16 @@ export default function App() {
     switch (currentType) {
       case 'comodato':
         return <ComodatoScreen />;
-      case 'compra':
-        return <CompraScreen />;
+      case 'smart_pre':
+        return <SmartPreScreen />;
       case 'gamer':
         return <GamerScreen />;
       case 'combo_tv':
         return <ComboTVScreen />;
       case 'ponto_adicional':
         return <PontoAdicionalScreen />;
+      case 'consulta_cep':
+        return <ConsultaCepScreen />;
       default:
         return <ComodatoScreen />;
     }
@@ -48,10 +51,11 @@ export default function App() {
   const getTypeName = (type: OSType) => {
     switch (type) {
       case 'comodato': return 'Comodato';
-      case 'compra': return 'Compra';
+      case 'smart_pre': return 'SMART-PRÉ';
       case 'gamer': return 'Gamer';
       case 'combo_tv': return 'Combo TV';
-      case 'ponto_adicional': return 'Ponto Adicional / Cabeamento';
+      case 'ponto_adicional': return 'Ponto Adicional';
+      case 'consulta_cep': return 'Consulta de CEP';
     }
   };
 
@@ -98,10 +102,11 @@ export default function App() {
           <div className="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
             {[
               { id: 'comodato', label: 'Comodato' },
-              { id: 'compra', label: 'Compra' },
+              { id: 'smart_pre', label: 'SMART-PRÉ' },
               { id: 'gamer', label: 'Gamer' },
               { id: 'combo_tv', label: 'Combo TV' },
-              { id: 'ponto_adicional', label: 'Ponto Adicional' }
+              { id: 'ponto_adicional', label: 'Ponto Adicional' },
+              { id: 'consulta_cep', label: 'Consultar CEP' }
             ].map(tab => (
               <button
                 key={tab.id}

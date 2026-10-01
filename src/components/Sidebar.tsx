@@ -1,10 +1,11 @@
 import React from 'react';
 import { 
   PackageCheck, 
-  ShoppingCart, 
+  CreditCard, 
   Gamepad2, 
   Tv, 
   Network, 
+  Search,
   ChevronLeft, 
   ChevronRight,
   Layers,
@@ -38,10 +39,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       desc: 'Instalação com equipamento em comodato'
     },
     {
-      id: 'compra',
-      label: 'Compra',
-      icon: <ShoppingCart className="w-5 h-5 shrink-0" />,
-      desc: 'Equipamento vendido ao cliente'
+      id: 'smart_pre',
+      label: 'SMART-PRÉ',
+      icon: <CreditCard className="w-5 h-5 shrink-0" />,
+      desc: 'Cliente compra equipamento e faz recargas para uso',
+      badge: 'PRÉ'
     },
     {
       id: 'gamer',
@@ -61,6 +63,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Ponto Adicional / Cabeamento',
       icon: <Network className="w-5 h-5 shrink-0" />,
       desc: 'Extensão de cabo de rede RJ45 e Mesh'
+    },
+    {
+      id: 'consulta_cep',
+      label: 'Consultar CEP',
+      icon: <Search className="w-5 h-5 shrink-0" />,
+      desc: 'Pesquisa por CEP, rua e bairro no CSV',
+      badge: 'CSV'
     }
   ];
 

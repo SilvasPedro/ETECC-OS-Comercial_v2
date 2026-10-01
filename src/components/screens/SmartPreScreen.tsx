@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Tv, 
+  CreditCard, 
   Calendar, 
   Clock, 
   MapPin, 
@@ -21,30 +21,17 @@ import {
   Trash2,
   AlertTriangle,
   X,
-  Layers
+  Zap
 } from 'lucide-react';
-import { ComboData } from '../../types/mask';
-import { formatMaskCombo } from '../../utils/maskTemplates';
+import { SmartPreData } from '../../types/mask';
+import { formatMaskSmartPre } from '../../utils/maskTemplates';
 import { MaskPreview } from '../MaskPreview';
 import { formatPhone } from '../../utils/formatters';
 
 const STORAGE_VENDEDOR_KEY = 'os_vendedor_nome';
 
-const COMBO_PF_PLANS = [
-  'Combo Básico - 139,90',
-  'Combo Essencial - 179,90',
-  'Combo Turbo Sky - 259,90',
-  'Combo Família - 299,90',
-  'Combo Ultra Sky - 319,90'
-];
-
-const COMBO_PJ_PLANS = [
-  'Combo Light - 209,90',
-  'Combo Select - 289,90',
-  'Combo Premium - 349,90'
-];
-
-export const ComboTVScreen: React.FC = () => {
+export const SmartPreScreen: React.FC = () => {
+  // Load saved seller name
   const getInitialVendedor = () => {
     try {
       return localStorage.getItem(STORAGE_VENDEDOR_KEY) || '';
@@ -53,7 +40,7 @@ export const ComboTVScreen: React.FC = () => {
     }
   };
 
-  const getInitialData = (sellerName = getInitialVendedor()): ComboData => ({
+  const getInitialData = (sellerName = getInitialVendedor()): SmartPreData => ({
     dataInstalacao: '',
     periodo: 'Comercial',
     horarioApos: '',
@@ -65,15 +52,14 @@ export const ComboTVScreen: React.FC = () => {
     telefone2: '',
     titularAcompanha: 'Sim',
     ladoPraiaMorro: 'Praia',
-    tipoCombo: 'Internet + TV',
-    plano: 'Combo Básico - 139,90',
-    modalidade: 'KIT GIGA COMODATO (FIXO)',
+    plano: '1Gbps - Sistema de Recargas',
+    modalidade: 'KIT GIGA SMART-PRÉ',
     comodoInstalacao: 'IRÁ ESCOLHER COM TÉCNICO',
     taxaAtivacao: 'INSTALAÇÃO GRATUITA',
     vendedor: sellerName
   });
 
-  const [data, setData] = useState<ComboData>(getInitialData);
+  const [data, setData] = useState<SmartPreData>(getInitialData);
   const [showPreview, setShowPreview] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [copiedDirect, setCopiedDirect] = useState(false);
@@ -87,7 +73,7 @@ export const ComboTVScreen: React.FC = () => {
     }
   };
 
-  const updateField = (field: keyof ComboData, value: any) => {
+  const updateField = (field: keyof SmartPreData, value: any) => {
     setData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -97,7 +83,7 @@ export const ComboTVScreen: React.FC = () => {
     setShowResetModal(false);
   };
 
-  const maskText = formatMaskCombo(data);
+  const maskText = formatMaskSmartPre(data);
 
   const handleCopyDirect = async () => {
     try {
@@ -131,17 +117,17 @@ export const ComboTVScreen: React.FC = () => {
       <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-[#e4022c]/10 text-[#e4022c] flex items-center justify-center font-bold shrink-0">
-            <Tv className="w-6 h-6" />
+            <CreditCard className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-slate-900 tracking-tight">O.S. de COMBO</h2>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">O.S. SMART-PRÉ</h2>
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#e4022c] text-white">
-                Máscara Oficial
+                Sistema de Recargas
               </span>
             </div>
             <p className="text-xs text-slate-500">
-              Instalação de pacotes Combo (Internet + TV / Telefone)
+              Cliente compra equipamento e faz recargas para uso
             </p>
           </div>
         </div>
@@ -197,7 +183,7 @@ export const ComboTVScreen: React.FC = () => {
 
       {/* Main Container */}
       <div className={`grid grid-cols-1 ${showPreview ? 'lg:grid-cols-12 gap-6' : 'max-w-4xl mx-auto'} items-start`}>
-        {/* Form Column - EXACT 16 FIELDS IN ORDER */}
+        {/* Form Column - EXACT 15 FIELDS IN ORDER */}
         <div className={`space-y-5 ${showPreview ? 'lg:col-span-7' : 'w-full'}`}>
           <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-5">
             {/* 1. DATA DA INSTALAÇÃO */}
@@ -293,7 +279,7 @@ export const ComboTVScreen: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="https://maps.app.goo.gl/... ou link Google Maps"
+                placeholder="Cole o link do Google Maps (ex: https://maps.app.goo.gl/...)"
                 value={data.localizacaoLink}
                 onChange={e => updateField('localizacaoLink', e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
@@ -308,7 +294,7 @@ export const ComboTVScreen: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="Ex: Próximo à praça / Portão branco / Em frente ao comércio"
+                placeholder="Ex: Próximo ao mercado / Portão marrom"
                 value={data.pontoReferencia}
                 onChange={e => updateField('pontoReferencia', e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
@@ -421,137 +407,44 @@ export const ComboTVScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* 11. TIPO DE COMBO */}
+            {/* 11. PLANO: 1Gbps - Sistema de Recargas (FIXO) */}
             <div>
-              <label className="block text-slate-800 font-bold mb-1.5 text-xs flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#e4022c]" />
-                <span>11. Tipo de Combo:</span>
+              <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
+                <Wifi className="w-3.5 h-3.5 text-[#e4022c]" />
+                <span>11. Plano:</span>
+                <span className="text-[10px] text-slate-400 font-normal">(Fixo)</span>
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {[
-                  'Internet + TV',
-                  'Internet + Telefone',
-                  'Internet + TV e Telefone'
-                ].map(tipo => (
-                  <button
-                    type="button"
-                    key={tipo}
-                    onClick={() => updateField('tipoCombo', tipo as any)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold transition text-center border ${
-                      data.tipoCombo === tipo
-                        ? 'bg-[#e4022c] text-white border-[#e4022c] shadow-xs'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {tipo}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 12. PLANO (PF e PJ) */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="block text-slate-800 font-bold text-xs flex items-center gap-1.5">
-                  <Wifi className="w-3.5 h-3.5 text-[#e4022c]" />
-                  <span>12. Plano:</span>
-                </label>
-                <span className="text-[11px] text-slate-400 font-medium">
-                  Clique na tag ou digite livremente abaixo
+              <div className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 flex items-center justify-between select-none">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-[#e4022c]" />
+                  <span>1Gbps - Sistema de Recargas</span>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-[#e4022c] bg-[#e4022c]/10 px-2 py-0.5 rounded">
+                  Fixo
                 </span>
               </div>
-
-              {/* Group 1: Pessoa Física (CPF) */}
-              <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-2.5 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                  <span>Planos Pessoa Física (CPF):</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
-                  {COMBO_PF_PLANS.map(tag => {
-                    const isSelected = data.plano === tag;
-                    return (
-                      <button
-                        type="button"
-                        key={tag}
-                        onClick={() => updateField('plano', tag)}
-                        className={`text-left text-[11px] px-2.5 py-1.5 rounded-lg transition font-medium border flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-[#e4022c] text-white border-[#e4022c] font-bold shadow-xs'
-                            : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        <span>{tag}</span>
-                        {isSelected && <Check className="w-3 h-3 text-white shrink-0" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Group 2: Pessoa Jurídica (PJ) */}
-              <div className="bg-amber-50/50 border border-amber-200/80 rounded-xl p-2.5 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900">
-                  <span className="w-2 h-2 rounded-full bg-amber-600"></span>
-                  <span>Planos Pessoa Jurídica (PJ / CNPJ):</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                  {COMBO_PJ_PLANS.map(tag => {
-                    const isSelected = data.plano === tag;
-                    return (
-                      <button
-                        type="button"
-                        key={tag}
-                        onClick={() => updateField('plano', tag)}
-                        className={`text-left text-[11px] px-2.5 py-1.5 rounded-lg transition font-medium border flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-[#e4022c] text-white border-[#e4022c] font-bold shadow-xs'
-                            : 'bg-white hover:bg-amber-100/50 text-amber-950 border-amber-200'
-                        }`}
-                      >
-                        <span>{tag}</span>
-                        {isSelected && <Check className="w-3 h-3 text-white shrink-0" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Free Text Input */}
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Nome do Plano (Livre para edição / personalização):
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Combo Básico - 139,90 ou digite o plano personalizado..."
-                  value={data.plano}
-                  onChange={e => updateField('plano', e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e4022c]"
-                />
-              </div>
             </div>
 
-            {/* 13. MODALIDADE: KIT GIGA COMODATO (FIXO) */}
+            {/* 12. MODALIDADE: KIT GIGA SMART-PRÉ (Fixo) */}
             <div>
               <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
                 <Tag className="w-3.5 h-3.5 text-[#e4022c]" />
-                <span>13. Modalidade:</span>
+                <span>12. Modalidade:</span>
                 <span className="text-[10px] text-slate-400 font-normal">(Fixo)</span>
               </label>
               <div className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 flex items-center justify-between select-none">
-                <span>KIT GIGA COMODATO</span>
+                <span>KIT GIGA SMART-PRÉ</span>
                 <span className="text-[10px] uppercase font-bold text-[#e4022c] bg-[#e4022c]/10 px-2 py-0.5 rounded">
                   Padrão Fixo
                 </span>
               </div>
             </div>
 
-            {/* 14. COMODO DE INSTALAÇÃO (Texto Padrão: IRÁ ESCOLHER COM TÉCNICO) */}
+            {/* 13. COMODO DE INSTALAÇÃO (Texto Padrão: IRÁ ESCOLHER COM TÉCNICO) */}
             <div>
               <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
                 <Home className="w-3.5 h-3.5 text-[#e4022c]" />
-                <span>14. Comodo de Instalação:</span>
+                <span>13. Comodo de Instalação:</span>
               </label>
               <input
                 type="text"
@@ -562,11 +455,11 @@ export const ComboTVScreen: React.FC = () => {
               />
             </div>
 
-            {/* 15. TAXA DE ATIVAÇÃO (Texto Padrão: INSTALAÇÃO GRATUITA) */}
+            {/* 14. TAXA DE ATIVAÇÃO (Texto Padrão: INSTALAÇÃO GRATUITA) */}
             <div>
               <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center gap-1.5">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span>15. Taxa de Ativação:</span>
+                <span>14. Taxa de Ativação:</span>
               </label>
               <input
                 type="text"
@@ -577,12 +470,12 @@ export const ComboTVScreen: React.FC = () => {
               />
             </div>
 
-            {/* 16. VENDEDOR(A) - Esse campo NÃO deve ser apagado com o botão de limpar */}
+            {/* 15. VENDEDOR(A) - Esse campo NÃO deve ser apagado com o botão de limpar */}
             <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5">
               <label className="block text-slate-800 font-bold mb-1 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-[#e4022c]" />
-                  <span>16. Vendedor(a):</span>
+                  <span>15. Vendedor(a):</span>
                 </div>
                 <span className="text-[10px] text-amber-800 font-semibold">
                   🔒 Permanente (Não apaga ao limpar campos)
@@ -648,7 +541,7 @@ export const ComboTVScreen: React.FC = () => {
         {showPreview && (
           <div className="lg:col-span-5 animate-in fade-in duration-200 mt-6 lg:mt-0">
             <MaskPreview
-              title="COMBO"
+              title="SMART-PRÉ"
               maskText={maskText}
               onReset={() => setShowResetModal(true)}
               clientPhone={data.telefone1}
@@ -682,7 +575,7 @@ export const ComboTVScreen: React.FC = () => {
 
             <div className="p-5 text-xs text-slate-600 space-y-2">
               <p>
-                Todos os dados digitados nesta Ordem de Serviço de <strong>COMBO</strong> serão restaurados para os valores padrão.
+                Todos os dados digitados nesta Ordem de Serviço de <strong>SMART-PRÉ</strong> serão restaurados para os valores padrão.
               </p>
               <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold">
                 🔒 <strong>Importante:</strong> O campo <strong>Vendedor(a)</strong> ({data.vendedor || 'não informado'}) NÃO será apagado.

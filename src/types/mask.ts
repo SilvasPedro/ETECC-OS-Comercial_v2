@@ -1,4 +1,4 @@
-export type OSType = 'comodato' | 'compra' | 'gamer' | 'combo_tv' | 'ponto_adicional';
+export type OSType = 'comodato' | 'smart_pre' | 'gamer' | 'combo_tv' | 'ponto_adicional' | 'consulta_cep';
 
 export interface ComodatoData {
   dataInstalacao: string;
@@ -21,6 +21,25 @@ export interface ComodatoData {
   avaliacaoPontoAdicional: 'Sim' | 'Não';
 }
 
+export interface SmartPreData {
+  dataInstalacao: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  podeAdiantar: 'Sim' | 'Não';
+  localizacaoLink: string;
+  pontoReferencia: string;
+  postePadrao: 'Sim' | 'Não';
+  telefone1: string;
+  telefone2: string;
+  titularAcompanha: 'Sim' | 'Não';
+  ladoPraiaMorro: 'Praia' | 'Morro';
+  plano: string; // '1Gbps - Sistema de Recargas' (Fixo)
+  modalidade: string; // 'KIT GIGA SMART-PRÉ' (Fixo)
+  comodoInstalacao: string; // 'IRÁ ESCOLHER COM TÉCNICO'
+  taxaAtivacao: string; // 'INSTALAÇÃO GRATUITA'
+  vendedor: string;
+}
+
 export interface BaseCustomerData {
   protocolo: string;
   vendedor: string;
@@ -40,7 +59,6 @@ export interface BaseCustomerData {
   observacoes: string;
 }
 
-
 export interface CompraData extends BaseCustomerData {
   plano: string;
   itemComprado: string;
@@ -58,6 +76,26 @@ export interface GamerData extends BaseCustomerData {
   jogosPlataformas: string;
   cabeamentoPcConsole: 'Sim (Passar cabo direto)' | 'Não (Apenas Wi-Fi)' | 'Cliente já possui cabo';
   qosPrioridade: 'Sim (Baixa latência configurada)' | 'Padrão';
+}
+
+export interface ComboData {
+  dataInstalacao: string;
+  periodo: 'Comercial' | 'Primeira do Dia' | 'Manhã' | 'Tarde' | 'Após';
+  horarioApos: string;
+  podeAdiantar: 'Sim' | 'Não';
+  localizacaoLink: string;
+  pontoReferencia: string;
+  postePadrao: 'Sim' | 'Não';
+  telefone1: string;
+  telefone2: string;
+  titularAcompanha: 'Sim' | 'Não';
+  ladoPraiaMorro: 'Praia' | 'Morro';
+  tipoCombo: 'Internet + TV' | 'Internet + Telefone' | 'Internet + TV e Telefone';
+  plano: string;
+  modalidade: string; // 'KIT GIGA COMODATO' (Fixo)
+  comodoInstalacao: string; // 'IRÁ ESCOLHER COM TÉCNICO'
+  taxaAtivacao: string; // 'INSTALAÇÃO GRATUITA'
+  vendedor: string;
 }
 
 export interface ComboTVData extends BaseCustomerData {
@@ -79,4 +117,11 @@ export interface PontoAdicionalData extends BaseCustomerData {
   comodoOrigem: string;
   comodoDestino: string;
   tipoPassagem: 'Tubulação interna existente' | 'Canaleta aparente' | 'Pelo forro / laje' | 'A avaliar no local';
+}
+
+export interface CepItem {
+  cep: string;
+  logradouro: string;
+  bairro: string;
+  cidade: string;
 }

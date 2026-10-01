@@ -1,0 +1,6 @@
+{
+  "name": "Gerador de OS Comercial",
+  "description": "Sistema profissional para geração, gestão, impressão e envio de Ordens de Serviço (OS) comerciais integrado ao Firebase com controle financeiro, assinaturas e clientes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
